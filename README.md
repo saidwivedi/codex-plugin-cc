@@ -1,14 +1,18 @@
 # Codex plugin for Claude Code
 
-Use Codex from inside Claude Code for code reviews or to delegate tasks to Codex.
+Fork of [openai/codex-plugin-cc](https://github.com/openai/codex-plugin-cc) with additional commands.
 
-This plugin is for Claude Code users who want an easy way to start using Codex from the workflow
-they already have.
+Use Codex from inside Claude Code for code reviews, plan reviews, or to delegate tasks to Codex.
+
+## [New] Commands
+
+- **`/codex:review-plan`** — Send your current implementation plan to Codex for independent review and critique. Works with plans from plan mode or any structured plan in the conversation.
 
 <video src="./docs/plugin-demo.webm" controls muted playsinline autoplay></video>
 
 ## What You Get
 
+- `/codex:review-plan` for independent review of your implementation plan **(new)**
 - `/codex:review` for a normal read-only Codex review
 - `/codex:adversarial-review` for a steerable challenge review
 - `/codex:rescue`, `/codex:status`, `/codex:result`, and `/codex:cancel` to delegate work and manage background jobs
@@ -24,13 +28,19 @@ they already have.
 Add the marketplace in Claude Code:
 
 ```bash
-/plugin marketplace add openai/codex-plugin-cc
+/plugin marketplace add saidwivedi/codex-plugin-cc
 ```
 
 Install the plugin:
 
 ```bash
-/plugin install codex@openai-codex
+/plugin install codex@saidwivedi-codex
+```
+
+If you have the original `codex@openai-codex` installed, disable it to avoid command conflicts:
+
+```bash
+claude plugin disable codex@openai-codex
 ```
 
 Reload plugins:
@@ -122,6 +132,32 @@ Examples:
 ```
 
 This command is read-only. It does not fix code.
+
+### `/codex:review-plan`
+
+Sends the current implementation plan from your Claude Code conversation to Codex for independent critical review.
+
+Unlike `/codex:review` which reviews git changes, this command reviews the **plan itself** — the steps, architecture decisions, ordering, and trade-offs — before you write any code.
+
+It supports `--wait`, `--background`, and `--effort`. You can also pass focus areas as free text.
+
+Examples:
+
+```bash
+/codex:review-plan
+/codex:review-plan --effort high
+/codex:review-plan --background focus on the data pipeline ordering
+/codex:review-plan are there any race conditions in steps 3-5?
+```
+
+Codex returns a structured review with:
+- **Verdict**: APPROVE / REQUEST_CHANGES / NEEDS_DISCUSSION
+- **Critical Issues**: Blocking problems
+- **Warnings**: Non-blocking concerns
+- **Suggestions**: Optional improvements
+- **Summary**: Overall assessment
+
+This command is read-only. It does not modify the plan.
 
 ### `/codex:rescue`
 
